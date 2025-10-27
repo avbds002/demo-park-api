@@ -23,4 +23,11 @@ public class UserService {
                 () -> new RuntimeException("Usuário não encontrado!")
         );
     }
+
+    @Transactional
+    public User updatePassword(Long id, String password) {
+        User user = findById(id);
+        user.setPassword(password);
+        return user;
+    }
 }
