@@ -6,6 +6,9 @@ import com.impactsoft.park_api.web.dto.UserResponseDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class UserMapper {
 
     public static User toUser(UserDTO createDTO) {
@@ -23,6 +26,10 @@ public class UserMapper {
         ModelMapper mapper = new ModelMapper();
         mapper.addMappings(props);
         return mapper.map(createUser, UserResponseDTO.class);
+    }
+
+    public static List<UserResponseDTO> toListDTO(List<User> users) {
+        return users.stream().map(user -> toDTO(user)).collect(Collectors.toList());
     }
 
 }

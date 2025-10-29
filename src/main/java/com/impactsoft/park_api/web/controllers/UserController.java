@@ -3,6 +3,7 @@ package com.impactsoft.park_api.web.controllers;
 import com.impactsoft.park_api.entities.User;
 import com.impactsoft.park_api.services.UserService;
 import com.impactsoft.park_api.web.dto.UserDTO;
+import com.impactsoft.park_api.web.dto.UserPasswordDTO;
 import com.impactsoft.park_api.web.dto.UserResponseDTO;
 import com.impactsoft.park_api.web.dto.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -27,22 +28,21 @@ public class UserController {
 
     //api/v1/users/1
     @GetMapping(value = "/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
         User user = userService.findById(id);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(UserMapper.toDTO(user));
     }
 
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<User> updatePassword(@PathVariable Long id, @RequestBody User user) {
-        User user1 = userService.updatePassword(id, user.getPassword());
-        return ResponseEntity.ok(user1);
+    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @RequestBody UserPasswordDTO userDTO) {
+        User user = userService.updatePassword(id, userDTO.getCurrentPassword(), userDTO.getNewPassword(), userDTO.getConfirmPassword());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAll() {
+    public ResponseEntity<List<UserResponseDTO>> getAll() {
         List<User> users = userService.findAll();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(UserMapper.toListDTO(users));
     }
-
 
 }
