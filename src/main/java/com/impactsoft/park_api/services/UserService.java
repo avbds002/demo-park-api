@@ -1,8 +1,11 @@
 package com.impactsoft.park_api.services;
 
 import com.impactsoft.park_api.entities.User;
+import com.impactsoft.park_api.exception.EntityNotFoundException;
+import com.impactsoft.park_api.exception.UsernameUniqueViolationException;
 import com.impactsoft.park_api.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,13 +19,18 @@ public class UserService {
 
     @Transactional
     public User save(User user) {
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        }
+        catch (DataIntegrityViolationException exception) {
+            throw new UsernameUniqueViolationException(String.format("Username %s already exists!", user.getUsername()));
+        }
     }
 
     @Transactional(readOnly = true)
     public User findById(Long id) {
         return userRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Usuário não encontrado!")
+                () -> new EntityNotFoundException(String.format("User id = %s not found!", id))
         );
     }
 

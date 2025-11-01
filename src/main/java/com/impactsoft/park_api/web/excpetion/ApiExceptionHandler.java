@@ -1,5 +1,7 @@
 package com.impactsoft.park_api.web.excpetion;
 
+import com.impactsoft.park_api.exception.EntityNotFoundException;
+import com.impactsoft.park_api.exception.UsernameUniqueViolationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,4 +27,23 @@ public class ApiExceptionHandler {
                 .body(new ErrorMessage(request, HttpStatus.UNPROCESSABLE_ENTITY, "Password must be 6 digits!", bindingResult));
     }
 
+    @ExceptionHandler(UsernameUniqueViolationException.class)
+    public ResponseEntity<ErrorMessage> UsernameUniqueViolationException(UsernameUniqueViolationException exception,
+                                                                         HttpServletRequest request) {
+        log.error("Api Error - ", exception);
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorMessage(request, HttpStatus.CONFLICT, exception.getMessage()));
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorMessage> EntityNotFoundException(EntityNotFoundException exception,
+                                                                         HttpServletRequest request) {
+        log.error("Api Error - ", exception);
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorMessage(request, HttpStatus.NOT_FOUND, exception.getMessage()));
+    }
 }
