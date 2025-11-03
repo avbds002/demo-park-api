@@ -1,4 +1,4 @@
-package com.impactsoft.park_api.web.excpetion;
+package com.impactsoft.park_api.web.exception;
 
 import com.impactsoft.park_api.exception.EntityNotFoundException;
 import com.impactsoft.park_api.exception.UsernameUniqueViolationException;

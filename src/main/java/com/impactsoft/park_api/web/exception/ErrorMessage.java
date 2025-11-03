@@ -1,4 +1,4 @@
-package com.impactsoft.park_api.web.excpetion;
+package com.impactsoft.park_api.web.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.servlet.http.HttpServletRequest;
