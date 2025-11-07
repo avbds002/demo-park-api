@@ -1,6 +1,7 @@
 package com.impactsoft.park_api;
 
 import com.impactsoft.park_api.web.dto.UserDTO;
+import com.impactsoft.park_api.web.dto.UserPasswordDTO;
 import com.impactsoft.park_api.web.dto.UserResponseDTO;
 import com.impactsoft.park_api.web.exception.ErrorMessage;
 import org.junit.jupiter.api.Test;
@@ -77,7 +78,6 @@ public class UserIT {
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
     }
-
 
     @Test
     public void createUser_withInvalidPassword_returnErrorMessageStatus422() {
@@ -165,5 +165,90 @@ public class UserIT {
 
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void updateUserPassword_withValidData_returnStatus204() {
+        testClient
+                .patch()
+                .uri("api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("123456", "test12", "test12"))
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    public void updateUserPassword_withInvalidID_returnStatus404() {
+        ErrorMessage responseBody = testClient
+                .patch()
+                .uri("api/v1/users/0")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("123456", "test12", "test12"))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void updateUserPassword_withInvalidFields_returnStatus422() {
+        ErrorMessage responseBody = testClient
+                .patch()
+                .uri("api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("12345", "test1", "test1"))
+                .exchange()
+                .expectStatus().isEqualTo(422)
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody = testClient
+                .patch()
+                .uri("api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("12345678", "test789", "test789"))
+                .exchange()
+                .expectStatus().isEqualTo(422)
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+    }
+
+    @Test
+    public void updateUserPassword_withInvalidPassword_returnStatus400() {
+        ErrorMessage responseBody = testClient
+                .patch()
+                .uri("api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("123456", "test12", "test124"))
+                .exchange()
+                .expectStatus().isEqualTo(400)
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
+
+        responseBody = testClient
+                .patch()
+                .uri("api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("00000123456", "test12", "test12"))
+                .exchange()
+                .expectStatus().isEqualTo(400)
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
     }
 }
