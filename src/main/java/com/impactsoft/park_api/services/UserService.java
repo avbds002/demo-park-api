@@ -2,6 +2,7 @@ package com.impactsoft.park_api.services;
 
 import com.impactsoft.park_api.entities.User;
 import com.impactsoft.park_api.exception.EntityNotFoundException;
+import com.impactsoft.park_api.exception.PasswordInvalidException;
 import com.impactsoft.park_api.exception.UsernameUniqueViolationException;
 import com.impactsoft.park_api.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +38,13 @@ public class UserService {
     @Transactional
     public User updatePassword(Long id, String currentPassword, String newPassword, String confirmPassword) {
         if (!newPassword.equals(confirmPassword)) {
-            throw  new RuntimeException("New password doesn't match confirmed password!");
+            throw new PasswordInvalidException("New password doesn't match with confirmation password.");
         }
 
         User user = findById(id);
 
         if (!user.getPassword().equals(currentPassword)) {
-            throw new RuntimeException("Your password doesn't match");
+            throw new PasswordInvalidException("New password doesn't match with confirmation password.");
         }
 
         user.setPassword(newPassword);

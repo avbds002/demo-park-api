@@ -39,6 +39,7 @@ public class UserIT {
 
     @Test
     public void createUser_withInvalidUsername_returnErrorMessageStatus422() {
+        //Test for wrong username
         ErrorMessage responseBody = testClient
                 .post()
                 .uri("api/v1/users")
@@ -52,6 +53,7 @@ public class UserIT {
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
 
+        //Test for empty username
         responseBody = testClient
                 .post()
                 .uri("api/v1/users")
@@ -65,6 +67,7 @@ public class UserIT {
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
 
+        //test for wrong username
         responseBody = testClient
                 .post()
                 .uri("api/v1/users")
@@ -81,6 +84,7 @@ public class UserIT {
 
     @Test
     public void createUser_withInvalidPassword_returnErrorMessageStatus422() {
+        //Test for empty password
         ErrorMessage responseBody = testClient
                 .post()
                 .uri("api/v1/users")
@@ -94,6 +98,7 @@ public class UserIT {
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
 
+        //Test for password with more than 6 digits
         responseBody = testClient
                 .post()
                 .uri("api/v1/users")
@@ -107,6 +112,7 @@ public class UserIT {
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
 
+        //Test for password with less than 6 digits
         responseBody = testClient
                 .post()
                 .uri("api/v1/users")
@@ -200,7 +206,20 @@ public class UserIT {
                 .patch()
                 .uri("api/v1/users/100")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserPasswordDTO("12345", "test1", "test1"))
+                .bodyValue(new UserPasswordDTO("", "", ""))
+                .exchange()
+                .expectStatus().isEqualTo(422)
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody = testClient
+                .patch()
+                .uri("api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("12345", "12345", "12345"))
                 .exchange()
                 .expectStatus().isEqualTo(422)
                 .expectBody(ErrorMessage.class)
@@ -229,7 +248,7 @@ public class UserIT {
                 .patch()
                 .uri("api/v1/users/100")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserPasswordDTO("123456", "test12", "test124"))
+                .bodyValue(new UserPasswordDTO("123456", "123456", "000000"))
                 .exchange()
                 .expectStatus().isEqualTo(400)
                 .expectBody(ErrorMessage.class)
@@ -242,7 +261,7 @@ public class UserIT {
                 .patch()
                 .uri("api/v1/users/100")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserPasswordDTO("00000123456", "test12", "test12"))
+                .bodyValue(new UserPasswordDTO("000000", "123456", "123456"))
                 .exchange()
                 .expectStatus().isEqualTo(400)
                 .expectBody(ErrorMessage.class)
