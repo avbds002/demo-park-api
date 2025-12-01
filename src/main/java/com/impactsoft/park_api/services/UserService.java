@@ -52,7 +52,20 @@ public class UserService {
         return user;
     }
 
+    @Transactional(readOnly = true)
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public User getByUsername(String username) {
+        return  userRepository.findbyUsername(username).orElseThrow(
+                () -> new EntityNotFoundException(String.format("User with username = %s not found!", username))
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public User.Role findRoleByUsername(String username) {
+        return userRepository.findRoleByUsername(username);
     }
 }
