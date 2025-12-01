@@ -14,7 +14,6 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     private final UserService userService;
 
-    //Classe do spring security utilizada para localizar o usuário no banco de dados
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userService.getByUsername(username);
