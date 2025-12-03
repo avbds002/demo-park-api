@@ -62,7 +62,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getByUsername(String username) {
-        return  userRepository.findbyUsername(username).orElseThrow(
+        return  userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User with username = %s not found!", username))
         );
     }
