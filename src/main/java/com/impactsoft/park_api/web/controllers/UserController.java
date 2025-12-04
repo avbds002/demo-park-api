@@ -71,6 +71,7 @@ public class UserController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             })
     @PatchMapping(value = "/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER') AND (#id == authentication.principal.id)")
     public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDTO userDTO) {
         User user = userService.updatePassword(id, userDTO.getCurrentPassword(), userDTO.getNewPassword(), userDTO.getConfirmPassword());
         return ResponseEntity.noContent().build();
