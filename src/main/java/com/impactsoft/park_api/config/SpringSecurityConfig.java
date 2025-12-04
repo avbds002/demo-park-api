@@ -1,5 +1,6 @@
 package com.impactsoft.park_api.config;
 
+import com.impactsoft.park_api.jwt.JwtAuthenticationEntryPoint;
 import com.impactsoft.park_api.jwt.JwtAuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,7 +36,9 @@ public class SpringSecurityConfig {
                 )
                 .addFilterBefore(
                         jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class
-                )
+                ).exceptionHandling(ex ->
+                        ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                        )
                 .build();
     }
 
