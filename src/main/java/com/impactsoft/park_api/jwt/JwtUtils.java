@@ -15,20 +15,15 @@ import java.util.Date;
 
 @Slf4j
 public class JwtUtils {
+
     public static final String JWT_BEARER = "Bearer ";
-
-    public static final String JWT_AUTHORIZATIONS = "Authorization";
-
+    public static final String JWT_AUTHORIZATION = "Authorization";
     public static final String SECRET_KEY = "0123456789-0123456789-0123456789";
-
     public static final long EXPIRE_DAYS = 0;
-
     public static final long EXPIRE_HOURS = 0;
+    public static final long EXPIRE_MINUTES = 30;
 
-    public static final long EXPIRE_MINUTES = 2;
-
-    private JwtUtils() {
-
+    private JwtUtils(){
     }
 
     private static Key generateKey() {
@@ -37,8 +32,8 @@ public class JwtUtils {
 
     private static Date toExpireDate(Date start) {
         LocalDateTime dateTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        LocalDateTime endTime = dateTime.plusDays(EXPIRE_DAYS).plusHours(EXPIRE_HOURS).plusMinutes(EXPIRE_MINUTES);
-        return Date.from(endTime.atZone(ZoneId.systemDefault()).toInstant());
+        LocalDateTime end = dateTime.plusDays(EXPIRE_DAYS).plusHours(EXPIRE_HOURS).plusMinutes(EXPIRE_MINUTES);
+        return Date.from(end.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public static JwtToken createToken(String username, String role) {
@@ -59,15 +54,12 @@ public class JwtUtils {
 
     private static Claims getClaimsFromToken(String token) {
         try {
-            return Jwts
-                    .parser()
+            return Jwts.parser()
                     .setSigningKey(generateKey()).build()
                     .parseClaimsJws(refactorToken(token)).getBody();
+        } catch (JwtException ex) {
+            log.error(String.format("Token invalido %s", ex.getMessage()));
         }
-        catch (JwtException ex) {
-            log.error(String.format("Invalid token %s ", ex.getMessage()));
-        }
-
         return null;
     }
 
@@ -77,14 +69,13 @@ public class JwtUtils {
 
     public static boolean isTokenValid(String token) {
         try {
-             Jwts.parser().setSigningKey(generateKey()).build().parseClaimsJws(refactorToken(token));
-
-             return true;
+            Jwts.parser()
+                    .setSigningKey(generateKey()).build()
+                    .parseClaimsJws(refactorToken(token));
+            return true;
+        } catch (JwtException ex) {
+            log.error(String.format("Token invalido %s", ex.getMessage()));
         }
-        catch (JwtException ex) {
-            log.error(String.format("Invalid token %s ", ex.getMessage()));
-        }
-
         return false;
     }
 

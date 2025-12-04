@@ -18,34 +18,34 @@ import java.io.IOException;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
+    private JwtUserDetailsService detailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        final String token = request.getHeader(JwtUtils.JWT_AUTHORIZATIONS);
+        final String token = request.getHeader(JwtUtils.JWT_AUTHORIZATION);
 
-        if (token == null || token.startsWith(JwtUtils.JWT_BEARER)) {
-            log.info("JWT is null, empty or not initialized with 'Bearer'");
+        if (token == null || !token.startsWith(JwtUtils.JWT_BEARER)) {
+            log.info("JWT Token is null, empty or not initialized with 'Bearer '.");
             filterChain.doFilter(request, response);
             return;
         }
 
-        if(!JwtUtils.isTokenValid(token)) {
-            log.info("JWT is invalid or expired");
+        if (!JwtUtils.isTokenValid(token)) {
+            log.warn("JWT Token is invalid or expired.");
             filterChain.doFilter(request, response);
             return;
         }
-        
+
         String username = JwtUtils.getUsernameFromToken(token);
-        
+
         toAuthentication(request, username);
 
         filterChain.doFilter(request, response);
     }
 
     private void toAuthentication(HttpServletRequest request, String username) {
-        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
+        UserDetails userDetails = detailsService.loadUserByUsername(username);
 
         UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken
                 .authenticated(userDetails, null, userDetails.getAuthorities());
